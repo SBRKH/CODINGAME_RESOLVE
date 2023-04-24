@@ -1,0 +1,129 @@
+import java.util.*;
+import java.io.*;
+import java.math.*;
+
+class Defibrilateur {
+    private Long number;
+    private String name;
+    private String address;
+    private String phoneNumber;
+    private Float lng;
+    private Float lat;
+
+    public Long getNumber() {
+        return this.number;
+    }
+
+    public void setNumber(Long number) {
+        this.number = number;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Float getLng() {
+        return this.lng;
+    }
+
+    public void setLng(Float lng) {
+        this.lng = lng;
+    }
+
+    public Float getLat() {
+        return this.lat;
+    }
+
+    public void setLat(Float lat) {
+        this.lat = lat;
+    }
+}
+
+/**
+ * Auto-generated code below aims at helping you parse
+ * the standard input according to the problem statement.
+ **/
+class Solution {
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        String LON = in.next();
+        String LAT = in.next();
+        int N = in.nextInt();
+        if (in.hasNextLine()) {
+            in.nextLine();
+        }
+        Float lng = Float.valueOf(LON.replace(",", "."));
+        Float latitude = Float.valueOf(LAT.replace(",", "."));
+        Defibrilateur current = null;
+        for (int i = 0; i < N; i++) {
+            String DEFIB = in.nextLine();
+            if (current == null) {
+                current = mapToDefibrilateur(DEFIB);
+            } else {
+                Defibrilateur toCompare = mapToDefibrilateur(DEFIB);
+                Double currentD = computeD(current, lng, latitude);
+                Double newD = computeD(toCompare, lng, latitude);
+                if (currentD > newD) {
+                    current = toCompare;
+                }
+            }
+        }
+
+        // Write an answer using System.out.println()
+        // To debug: System.err.println("Debug messages...");
+        System.out.println(current.getName());
+    }
+
+    private static Defibrilateur mapToDefibrilateur(String data) {
+        String[] splitData = data.split(";");
+        Defibrilateur def = new Defibrilateur();
+        def.setNumber(Long.valueOf(splitData[0]));
+        def.setName(splitData[1]);
+        def.setAddress(splitData[2]);
+        if (!isNumeric(splitData[3])) {
+            def.setPhoneNumber(splitData[3]);
+            def.setLng(Float.valueOf(splitData[4].replace(",", ".")));
+            def.setLat(Float.valueOf(splitData[5].replace(",", ".")));
+        } else {
+            def.setLng(Float.valueOf(splitData[3].replace(",", ".")));
+            def.setLat(Float.valueOf(splitData[4].replace(",", ".")));
+        }
+
+        return def;
+    }
+
+    private static boolean isNumeric(String str) {
+        return str.matches("\\d+(\\.\\d+)?"); // match a number with decimal.
+    }
+
+    private static Double computeD(Defibrilateur d, Float lng, Float lat) {
+        Float a = lng - d.getLng();
+        Float b = d.getLat() + lat;
+        Double x = a * Math.cos(b/2);
+        
+        Float c = lat - d.getLat();
+
+        return Math.sqrt(Math.pow(x, 2)+Math.pow(c, 2)) * 6371;
+    }
+}
